@@ -329,7 +329,6 @@ struct lua_State {
   int basehookcount;
   int hookcount;
   volatile l_signalT hookmask;
-  int hookyield; /* requested yield after hook execution */
 };
 
 
