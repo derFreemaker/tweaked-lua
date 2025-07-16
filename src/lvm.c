@@ -1174,37 +1174,6 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
   for (;;) {
     Instruction i;  /* instruction being executed */
     vmfetch();
-
-    #define lua_low_level_debug 0 
-    if (L->yieldafterinstructions && !--L->yieldafterinstructions) {
-      #if lua_low_level_debug
-      {
-        /* low-level line tracing for debugging Lua */
-        const Proto* f = cl->p;
-        PrintFunction(f, 1, G(L)->tmname);
-        printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
-        printf("yielding...\n");
-        PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
-      }
-      #endif
-
-      lua_yield(L, 0);
-
-      ci->u.l.savedpc = pc; /* save instruction point */
-      if (!isIT(*(ci->u.l.savedpc - 1)))  /* top not being used? */
-        L->top.p = ci->top.p;  /* correct top */
-      ci->callstatus |= CIST_HOOKYIELD;  /* mark that it yielded */
-      luaD_throw(L, LUA_YIELD);
-    }
-    #if lua_low_level_debug
-    else
-    {
-      /* low-level line tracing for debugging Lua */
-      const Proto* f = cl->p;
-      printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
-      PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
-    }
-    #endif
     
     lua_assert(base == ci->func.p + 1);
     lua_assert(base <= L->top.p && L->top.p <= L->stack_last.p);
@@ -1925,6 +1894,37 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         vmbreak;
       }
     }
+
+    #define lua_low_level_debug 0 
+    if (L->yieldafterinstructions && !--L->yieldafterinstructions) {
+      #if lua_low_level_debug
+      {
+        /* low-level line tracing for debugging Lua */
+        const Proto* f = cl->p;
+        PrintFunction(f, 1, G(L)->tmname);
+        printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
+        printf("yielding...\n");
+        PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
+      }
+      #endif
+
+      lua_yield(L, 0);
+
+      ci->u.l.savedpc = pc + 1; /* save next instruction point */
+      if (!isIT(*(ci->u.l.savedpc - 1)))  /* top not being used? */
+        L->top.p = ci->top.p;  /* correct top */
+      ci->callstatus |= CIST_HOOKYIELD;  /* mark that it yielded */
+      luaD_throw(L, LUA_YIELD);
+    }
+    #if lua_low_level_debug
+    else
+    {
+      /* low-level line tracing for debugging Lua */
+      const Proto* f = cl->p;
+      printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
+      PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
+    }
+    #endif
   }
 }
 
