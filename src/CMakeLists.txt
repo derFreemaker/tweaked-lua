@@ -65,7 +65,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LUA_SYSLDFLAGS} ${LUA_MY
 set(LUA_CORE_SRCS
         lapi.c lcode.c lctype.c ldebug.c ldo.c ldump.c lfunc.c lgc.c
         llex.c lmem.c lobject.c lopcodes.c lparser.c lstate.c lstring.c
-        ltable.c ltm.c lundump.c lvm.c lzio.c
+        ltable.c ltm.c lundump.c lvm.c lzio.c lprint.c
 )
 
 set(LUA_LIB_SRCS

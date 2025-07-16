@@ -30,6 +30,7 @@
 #include "ltm.h"
 #include "lvm.h"
 
+#include "lprint.h"
 
 /*
 ** By default, use jump tables in the main interpreter loop on gcc
@@ -1173,10 +1174,44 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
   for (;;) {
     Instruction i;  /* instruction being executed */
     vmfetch();
+
     #if 0
+    {
       /* low-level line tracing for debugging Lua */
       printf("line: %d\n", luaG_getfuncline(cl->p, pcRel(pc, cl->p)));
+      const Proto* f = cl->p;
+      const Instruction* code=f->code;
+      int pc=f->sizecode;
+      PrintInstruction(f, i, pc, code, G(L)->tmname);
+    }
     #endif
+    
+    if (L->yieldafterinstructions && !--L->yieldafterinstructions) {
+      // {
+      //   /* low-level line tracing for debugging Lua */
+      //   const Proto* f = cl->p;
+      //   PrintFunction(f, 1, G(L)->tmname);
+      //   printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
+      //   printf("yielding...\n");
+      //   PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
+      // }
+
+      lua_yield(L, 0);
+
+      ci->u.l.savedpc = pc; /* save instruction point */
+      if (!isIT(*(ci->u.l.savedpc - 1)))  /* top not being used? */
+        L->top.p = ci->top.p;  /* correct top */
+      ci->callstatus |= CIST_HOOKYIELD;  /* mark that it yielded */
+      luaD_throw(L, LUA_YIELD);
+    }
+    // else
+    // {
+    //   /* low-level line tracing for debugging Lua */
+    //   const Proto* f = cl->p;
+    //   printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
+    //   PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
+    // }
+    
     lua_assert(base == ci->func.p + 1);
     lua_assert(base <= L->top.p && L->top.p <= L->stack_last.p);
     /* invalidate top for instructions not expecting it */
