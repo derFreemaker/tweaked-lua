@@ -308,6 +308,7 @@ LUA_API int (lua_dump) (lua_State *L, lua_Writer writer, void *data, int strip);
 */
 LUA_API int  (lua_yieldk)     (lua_State *L, int nresults, lua_KContext ctx,
                                lua_KFunction k);
+LUA_API void  (lua_yieldafterinstructions) (lua_State *L, long long instructions);
 LUA_API int  (lua_resume)     (lua_State *L, lua_State *from, int narg,
                                int *nres);
 LUA_API int  (lua_status)     (lua_State *L);

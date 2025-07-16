@@ -114,6 +114,22 @@ static int luaB_yield (lua_State *L) {
 }
 
 
+static int luaB_yieldafterinstructions (lua_State *L)
+{
+  if (lua_type(L, 1) == LUA_TTHREAD)
+  {
+    lua_State *co = lua_tothread(L, 1);
+    long long instructions = luaL_checkinteger(L, 2);
+    lua_yieldafterinstructions(co, instructions);
+    return 0;
+  }
+  
+  long long instructions = luaL_checkinteger(L, 1);
+  lua_yieldafterinstructions(L, instructions);
+  return 0;
+}
+
+
 #define COS_RUN		0
 #define COS_DEAD	1
 #define COS_YIELD	2
@@ -196,6 +212,7 @@ static const luaL_Reg co_funcs[] = {
   {"status", luaB_costatus},
   {"wrap", luaB_cowrap},
   {"yield", luaB_yield},
+  {"yieldafterinstructions", luaB_yieldafterinstructions},
   {"isyieldable", luaB_yieldable},
   {"close", luaB_close},
   {NULL, NULL}
