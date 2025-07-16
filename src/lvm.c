@@ -1175,26 +1175,18 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
     Instruction i;  /* instruction being executed */
     vmfetch();
 
-    #if 0
-    {
-      /* low-level line tracing for debugging Lua */
-      printf("line: %d\n", luaG_getfuncline(cl->p, pcRel(pc, cl->p)));
-      const Proto* f = cl->p;
-      const Instruction* code=f->code;
-      int pc=f->sizecode;
-      PrintInstruction(f, i, pc, code, G(L)->tmname);
-    }
-    #endif
-    
+    #define lua_low_level_debug 0 
     if (L->yieldafterinstructions && !--L->yieldafterinstructions) {
-      // {
-      //   /* low-level line tracing for debugging Lua */
-      //   const Proto* f = cl->p;
-      //   PrintFunction(f, 1, G(L)->tmname);
-      //   printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
-      //   printf("yielding...\n");
-      //   PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
-      // }
+      #if lua_low_level_debug
+      {
+        /* low-level line tracing for debugging Lua */
+        const Proto* f = cl->p;
+        PrintFunction(f, 1, G(L)->tmname);
+        printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
+        printf("yielding...\n");
+        PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
+      }
+      #endif
 
       lua_yield(L, 0);
 
@@ -1204,13 +1196,15 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
       ci->callstatus |= CIST_HOOKYIELD;  /* mark that it yielded */
       luaD_throw(L, LUA_YIELD);
     }
-    // else
-    // {
-    //   /* low-level line tracing for debugging Lua */
-    //   const Proto* f = cl->p;
-    //   printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
-    //   PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
-    // }
+    #if lua_low_level_debug
+    else
+    {
+      /* low-level line tracing for debugging Lua */
+      const Proto* f = cl->p;
+      printf("line: %d\n", luaG_getfuncline(f, pcRel(pc, f)));
+      PrintInstruction(f, i, pcRel(pc, f), G(L)->tmname);
+    }
+    #endif
     
     lua_assert(base == ci->func.p + 1);
     lua_assert(base <= L->top.p && L->top.p <= L->stack_last.p);
