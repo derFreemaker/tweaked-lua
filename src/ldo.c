@@ -910,10 +910,15 @@ LUA_API int lua_yieldk (lua_State *L, int nresults, lua_KContext ctx,
 }
 
 
-LUA_API void lua_yieldafterinstructions (lua_State *L, long long instructions)
-{
+LUA_API void lua_yieldafterinstructions (lua_State *L, long long instructions) {
   L->yieldafterinstructions = instructions;
 }
+
+
+LUA_API void lua_yieldafterinstruction (lua_State *L, int shouldyield) {
+  G(L)->yieldafterinstruction = shouldyield;
+}
+
 
 /*
 ** Auxiliary structure to call 'luaF_close' in protected mode.

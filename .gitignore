@@ -1,2 +1,9 @@
-cmake-build-debug
-cmake-build-release
+# IDE files
+.vs
+.idea
+.vscode
+
+# build files
+.zig-cache
+zig-out
+
