@@ -53,7 +53,7 @@ static int auxresume (lua_State *L, lua_State *co, int narg) {
 }
 
 
-static int luaB_coresume (lua_State *L) {
+LUA_API int luaB_coresume (lua_State *L) {
   lua_State *co = getco(L);
   int r;
   r = auxresume(L, co, lua_gettop(L) - 1);
