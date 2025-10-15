@@ -1144,14 +1144,14 @@ void luaV_finishOp (lua_State *L) {
     updatebase(ci);  /* correct stack */ \
   } \
   i = *(pc++); \
-  if (G(L)->yieldafterinstruction) { \
+  if (L->allowhook && G(L)->yieldafterinstruction) { \
     lua_yield(L, 0); \
     ci->u.l.savedpc = pc; /* save instruction point */ \
     if (!isIT(*(ci->u.l.savedpc - 1)))  /* top not being used? */L->top.p = ci->top.p;  /* correct top */ \
     ci->callstatus |= CIST_HOOKYIELD;  /* mark that it yielded */ \
     luaD_throw(L, LUA_YIELD); \
   } \
-  if (L->yieldafterinstructions && !--L->yieldafterinstructions) { \
+  if (L->allowhook && L->yieldafterinstructions && !--L->yieldafterinstructions) { \
     lua_yield(L, 0); \
     ci->u.l.savedpc = pc; /* save instruction point */ \
     if (!isIT(*(ci->u.l.savedpc - 1)))  /* top not being used? */L->top.p = ci->top.p;  /* correct top */ \

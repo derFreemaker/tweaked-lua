@@ -4,6 +4,7 @@
 .vscode
 
 # build files
+build
 .zig-cache
 zig-out
 
