@@ -64,22 +64,32 @@ pub fn build(b: *std.Build) void {
         lib.addIncludePath(user_h.dirname());
         lib.installHeader(user_h, user_header);
     }
-    
-    b.installArtifact(lib);
-    
-    _ = b.addModule("includes", .{
+
+    const install_lib = b.addInstallArtifact(lib, .{});
+
+    const c_headers = b.addTranslateC(.{
         .target = target,
         .optimize = optimize,
-        .root_source_file = b.path("src/includes.zig"),
+        .root_source_file = b.path("src/lua_all.h"),
     });
-    
+    c_headers.addIncludePath(lib.getEmittedIncludeTree());
+    c_headers.step.dependOn(&install_lib.step);
+
+    _ = b.addModule("headers", .{
+        .target = target,
+        .optimize = optimize,
+
+        .root_source_file = c_headers.getOutput(),
+        .link_libc = c_headers.link_libc,
+    });
+
     if (shared) {
         const shared_lib = b.addLibrary(.{
             .name = "lua5.4",
             .linkage = .dynamic,
             .root_module = lib_mod,
         });
-        
+
         b.installArtifact(shared_lib);
     }
 
@@ -103,6 +113,7 @@ pub fn build(b: *std.Build) void {
             .flags = &flags,
         });
         exe_mod.linkLibrary(lib);
+        exe.step.dependOn(&install_lib.step);
 
         b.installArtifact(exe);
     }
@@ -127,6 +138,7 @@ pub fn build(b: *std.Build) void {
             .flags = &flags,
         });
         exe_mod.linkLibrary(lib);
+        exe.step.dependOn(&install_lib.step);
 
         b.installArtifact(exe);
     }
