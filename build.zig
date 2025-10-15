@@ -67,6 +67,12 @@ pub fn build(b: *std.Build) void {
     
     b.installArtifact(lib);
     
+    _ = b.addModule("includes", .{
+        .target = target,
+        .optimize = optimize,
+        .root_source_file = b.path("src/includes.zig"),
+    });
+    
     if (shared) {
         const shared_lib = b.addLibrary(.{
             .name = "lua5.4",
