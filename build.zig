@@ -45,10 +45,13 @@ pub fn build(b: *std.Build) void {
         if (target.result.os.tag == .windows and shared) "-DLUA_BUILD_AS_DLL" else "",
 
         if (lua_user_h) |_| b.fmt("-DLUA_USER_H=\"{s}\"", .{user_header}) else "",
+
+        "-DLUA_COMPAT_5_3",
     };
     lib.linkLibC();
 
     lib_mod.addCSourceFiles(.{
+        .language = .c,
         .root = b.path("."),
         .files = &lua_source_files,
         .flags = &flags,
@@ -103,10 +106,12 @@ pub fn build(b: *std.Build) void {
 
             .root_module = exe_mod,
         });
+        exe.rdynamic = true;
 
         exe_mod.addIncludePath(b.path("src"));
 
         exe_mod.addCSourceFile(.{
+            .language = .c,
             .file = b.path("src/lua.c"),
             .flags = &flags,
         });
@@ -128,10 +133,12 @@ pub fn build(b: *std.Build) void {
 
             .root_module = exe_mod,
         });
+        exe.rdynamic = true;
 
         exe_mod.addIncludePath(b.path("src"));
 
         exe_mod.addCSourceFile(.{
+            .language = .c,
             .file = b.path("src/luac.c"),
             .flags = &flags,
         });
