@@ -17,7 +17,7 @@ pub fn build(b: *std.Build) void {
     });
 
     const lib = b.addLibrary(.{
-        .name = "lua5.4",
+        .name = "lua5.4_static",
         .linkage = .static,
         .version = lua_version,
         .root_module = lib_mod,
@@ -85,7 +85,7 @@ pub fn build(b: *std.Build) void {
 
     if (shared) {
         const shared_lib = b.addLibrary(.{
-            .name = "lua5.4",
+            .name = "lua5.4_shared",
             .linkage = .dynamic,
             .root_module = lib_mod,
         });

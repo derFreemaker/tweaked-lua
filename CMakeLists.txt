@@ -1,7 +1,41 @@
 cmake_minimum_required(VERSION 4.0)
-project(lua_static C)
+project(lua C)
 
 set(CMAKE_C_STANDARD 99)
+
+set(USER_HEADER "user.h")
+
+set(FLAGS
+        -std=gnu99
+)
+
+# OS-specific macros
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    list(APPEND FLAGS -DLUA_USE_LINUX)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    list(APPEND FLAGS -DLUA_USE_MACOSX)
+elseif(WIN32)
+    list(APPEND FLAGS -DLUA_USE_WINDOWS)
+else()
+    list(APPEND FLAGS -DLUA_USE_POSIX)
+endif()
+
+# Enable API check for Debug builds
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    list(APPEND FLAGS -DLUA_USE_APICHECK)
+endif()
+
+# Build as DLL for Windows if shared
+if(WIN32 AND BUILD_SHARED_LIBS)
+    list(APPEND FLAGS -DLUA_BUILD_AS_DLL)
+endif()
+
+# Optional user header
+if(LUA_USER_H)
+    list(APPEND FLAGS -DLUA_USER_H=\"${USER_HEADER}\")
+endif()
+
+add_compile_options(${FLAGS})
 
 set(SOURCES
         src/lapi.c
@@ -73,18 +107,16 @@ set(LUAC_EXE_SOURCES
         src/lua.c
 )
 
-add_compile_definitions(-DLUA_USE_POSIX)
-
-add_library(lua_static STATIC ${SOURCES})
-target_link_libraries(lua_static m)
-set_target_properties(lua_static PROPERTIES OUTPUT_NAME "lua5.4")
+add_library(liblua STATIC ${SOURCES})
+target_link_libraries(liblua m)
+set_target_properties(liblua PROPERTIES OUTPUT_NAME "lua5.4")
 
 add_library(lua_shared SHARED ${SOURCES})
 target_link_libraries(lua_shared m)
 set_target_properties(lua_shared PROPERTIES OUTPUT_NAME "lua5.4")
 
 add_executable(lua ${LUA_EXE_SOURCES})
-target_link_libraries(lua lua_static)
+target_link_libraries(lua liblua)
 
 add_executable(luac ${LUAC_EXE_SOURCES})
-target_link_libraries(luac lua_static)
+target_link_libraries(luac liblua)
