@@ -46,6 +46,7 @@ pub fn build(b: *std.Build) void {
 
         if (lua_user_h) |_| b.fmt("-DLUA_USER_H=\"{s}\"", .{user_header}) else "",
     };
+    lib.linkLibC();
 
     lib_mod.addCSourceFiles(.{
         .root = b.path("."),
@@ -53,19 +54,6 @@ pub fn build(b: *std.Build) void {
         .flags = &flags,
     });
 
-    lib.linkLibC();
-
-    lib.installHeader(b.path("src/lua.h"), "lua.h");
-    lib.installHeader(b.path("src/lualib.h"), "lualib.h");
-    lib.installHeader(b.path("src/lauxlib.h"), "lauxlib.h");
-    lib.installHeader(b.path("src/luaconf.h"), "luaconf.h");
-
-    if (lua_user_h) |user_h| {
-        lib.addIncludePath(user_h.dirname());
-        lib.installHeader(user_h, user_header);
-    }
-
-    b.installArtifact(lib);
     const install_lib = b.addInstallArtifact(lib, .{});
 
     const c_headers = b.addTranslateC(.{
@@ -84,14 +72,23 @@ pub fn build(b: *std.Build) void {
         .link_libc = c_headers.link_libc,
     });
 
-    if (shared) {
-        const shared_lib = b.addLibrary(.{
-            .name = "lua54",
-            .linkage = .dynamic,
-            .root_module = lib_mod,
-        });
+    const exposed_lib = b.addLibrary(.{
+        .name = "lua54",
+        .linkage = if (shared) .dynamic else .static,
+        .root_module = lib_mod,
+    });
+    b.installArtifact(exposed_lib);
 
-        b.installArtifact(shared_lib);
+    exposed_lib.linkLibC();
+
+    exposed_lib.installHeader(b.path("src/lua.h"), "lua.h");
+    exposed_lib.installHeader(b.path("src/lualib.h"), "lualib.h");
+    exposed_lib.installHeader(b.path("src/lauxlib.h"), "lauxlib.h");
+    exposed_lib.installHeader(b.path("src/luaconf.h"), "luaconf.h");
+
+    if (lua_user_h) |user_h| {
+        exposed_lib.addIncludePath(user_h.dirname());
+        exposed_lib.installHeader(user_h, user_header);
     }
 
     if (build_lua) {
