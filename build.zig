@@ -65,6 +65,7 @@ pub fn build(b: *std.Build) void {
         lib.installHeader(user_h, user_header);
     }
 
+    b.installArtifact(lib);
     const install_lib = b.addInstallArtifact(lib, .{});
 
     const c_headers = b.addTranslateC(.{
