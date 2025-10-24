@@ -312,7 +312,7 @@ LUA_API void  (lua_yieldafterinstructions) (lua_State *L, long long instructions
 /*
 ** yields lua universe after the current instruction
 */
-LUA_API void  (lua_yieldafterinstruction) (lua_State *L, int shoudyield);
+LUA_API void  (lua_yieldnextinstruction) (lua_State *L, int shoudyield);
 LUA_API int (luaB_coresume) (lua_State *L);
 LUA_API int  (lua_resume)     (lua_State *L, lua_State *from, int narg,
                                int *nres);

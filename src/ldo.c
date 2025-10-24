@@ -915,8 +915,8 @@ LUA_API void lua_yieldafterinstructions (lua_State *L, long long instructions) {
 }
 
 
-LUA_API void lua_yieldafterinstruction (lua_State *L, int shouldyield) {
-  G(L)->yieldafterinstruction = shouldyield;
+LUA_API void lua_yieldnextinstruction (lua_State *L, int shouldyield) {
+  L->yieldnextinstruction = shouldyield;
 }
 
 

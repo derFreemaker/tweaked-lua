@@ -300,7 +300,6 @@ typedef struct global_State {
   TString *strcache[STRCACHE_N][STRCACHE_M];  /* cache for strings in API */
   lua_WarnFunction warnf;  /* warning function */
   void *ud_warn;         /* auxiliary data to 'warnf' */
-  int yieldafterinstruction;
 } global_State;
 
 
@@ -331,6 +330,7 @@ struct lua_State {
   int hookcount;
   volatile l_signalT hookmask;
   long long yieldafterinstructions;
+  int yieldnextinstruction;
 };
 
 
