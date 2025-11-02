@@ -40,13 +40,14 @@ pub fn build(b: *std.Build) void {
 
         // Enable api check
         if (optimize == .Debug) "-DLUA_USE_APICHECK" else "",
-
-        // Build as DLL for windows if shared
-        if (target.result.os.tag == .windows and shared) "-DLUA_BUILD_AS_DLL" else "",
-
+        
         if (lua_user_h) |_| b.fmt("-DLUA_USER_H=\"{s}\"", .{user_header}) else "",
 
         "-DLUA_COMPAT_5_3",
+    };
+    const lib_flags = flags ++ [_][]const u8{
+        // Build as DLL for windows if shared
+        if (target.result.os.tag == .windows and shared) "-DLUA_BUILD_AS_DLL" else "",
     };
     lib.linkLibC();
 
@@ -54,7 +55,7 @@ pub fn build(b: *std.Build) void {
         .language = .c,
         .root = b.path("."),
         .files = &lua_source_files,
-        .flags = &flags,
+        .flags = &lib_flags,
     });
 
     const install_lib = b.addInstallArtifact(lib, .{});

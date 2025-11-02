@@ -10,15 +10,15 @@ set(FLAGS
 )
 
 # OS-specific macros
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    list(APPEND FLAGS -DLUA_USE_LINUX)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    list(APPEND FLAGS -DLUA_USE_MACOSX)
-elseif(WIN32)
-    list(APPEND FLAGS -DLUA_USE_WINDOWS)
-else()
-    list(APPEND FLAGS -DLUA_USE_POSIX)
-endif()
+#if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+#    list(APPEND FLAGS -DLUA_USE_LINUX)
+#elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+#    list(APPEND FLAGS -DLUA_USE_MACOSX)
+#elseif(WIN32)
+#    list(APPEND FLAGS -DLUA_USE_WINDOWS)
+#else()
+#    list(APPEND FLAGS -DLUA_USE_POSIX)
+#endif()
 
 # Enable API check for Debug builds
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -109,7 +109,7 @@ set(LUAC_EXE_SOURCES
 
 add_library(liblua STATIC ${SOURCES})
 target_link_libraries(liblua m)
-set_target_properties(liblua PROPERTIES OUTPUT_NAME "lua5.4")
+set_target_properties(liblua PROPERTIES OUTPUT_NAME "liblua5.4")
 
 add_library(lua_shared SHARED ${SOURCES})
 target_link_libraries(lua_shared m)
